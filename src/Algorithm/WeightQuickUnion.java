@@ -20,7 +20,13 @@ public class WeightQuickUnion {
         if(!connected(u.x, u.y)){
             int l = root(u.x);
             int k = root(u.y);
-            id[l] = k;
+            if(sz[l] > sz[k]){
+                id[k] = l;
+                sz[l] += sz[k];
+            } else {
+                id[l] = k;
+                sz[k] += sz[l];
+            }
         }
     }
 
