@@ -1,4 +1,4 @@
-package Algorithm;
+//package Algorithm;
 
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
@@ -8,7 +8,8 @@ public class PercolationStats {
 
     private int experimentsCount;
     private double[] results;
-    private Percolation percolation;
+    private double mean;
+    private double stddev;
 
     public PercolationStats(int N, int T){
         if(N <= 0 || T <= 0){
@@ -17,42 +18,39 @@ public class PercolationStats {
         experimentsCount = T;
         results = new double[T];
         for (int i = 0; i < T; ++i){
-            percolation = new Percolation(N);
-            int opened = 0;
+            Percolation percolation = new Percolation(N);
             while (!percolation.percolates()){
                 int a = StdRandom.uniform(1, N+1);
                 int b = StdRandom.uniform(1, N+1);
                 if(!percolation.isOpen(a, b)){
                     percolation.open(a,b);
-                    ++opened;
                 }
-                results[i] = (double)opened/(N*N);
-                //System.out.println(results[i]);
             }
+            results[i] = (double)percolation.numberOfOpenSites()/(N*N);
         }
+        stddev = StdStats.stddev(results);
+        mean = StdStats.mean(results);
     }
 
     public double confidenceLo() {
-        return mean() - ((1.96 * stddev()) / Math.sqrt(experimentsCount));
+        return mean - ((1.96 * stddev) / Math.sqrt(experimentsCount));
     }
 
     public double confidenceHi() {
-        return mean() + ((1.96 * stddev()) / Math.sqrt(experimentsCount));
+        return mean + ((1.96 * stddev) / Math.sqrt(experimentsCount));
     }
 
     public double mean(){
-        return StdStats.mean(results);
+        return mean;
     }
 
     public double stddev(){
-        return  StdStats.stddev(results);
+        return stddev;
     }
 
-
-
     public static void main(String[] args) {
-        int N = 2;//Integer.parseInt(args[0]);
-        int T = 10000;//Integer.parseInt(args[1]);
+        int N = Integer.parseInt(args[0]);
+        int T = Integer.parseInt(args[1]);
         PercolationStats ps = new PercolationStats(N, T);
 
         String confidence = ps.confidenceLo() + ", " + ps.confidenceHi();

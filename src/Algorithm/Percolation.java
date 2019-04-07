@@ -1,10 +1,5 @@
-package Algorithm;
-
-import Model.Union;
-import Reader.UnionReader;
+//package Algorithm;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
-
-import java.util.ArrayList;
 
 public class Percolation {
 
@@ -18,6 +13,10 @@ public class Percolation {
     private final int size;
 
     public Percolation(int N){
+        if(N <= 0){
+            throw new IllegalArgumentException();
+        }
+
         size = N;
         bottom = N*N+1;
         wq = new WeightedQuickUnionUF(N*N+2);
@@ -25,6 +24,14 @@ public class Percolation {
     }
 
     public void open(int row, int col)  {
+        if(row < 1 || col < 1 || row > size || col > size){
+            throw new IllegalArgumentException();
+        }
+
+        if(isOpen(row, col)){
+            return;
+        }
+
         opened[row-1][col-1] = true;
         numOfOpen++;
 
@@ -52,10 +59,16 @@ public class Percolation {
     }
 
     public boolean isOpen(int row, int col) {
+        if(row < 1 || col < 1 || row > size || col > size){
+            throw new IllegalArgumentException();
+        }
         return opened[row-1][col-1];
     }
 
     public boolean isFull(int row, int col) {
+        if(row < 1 || col < 1 || row > size || col > size){
+            throw new IllegalArgumentException();
+        }
         return wq.connected(getSiteIndex(row,col), top);
     }
 
@@ -70,16 +83,4 @@ public class Percolation {
     private int getSiteIndex(int row, int col){
         return (row - 1) * size + col;
     }
-
-    public static void main(String[] args)  {
-        UnionReader reader = new UnionReader();
-        ArrayList<Union> list = reader.readUnion("data.txt");
-
-        Percolation percolation = new Percolation(3);
-        for (Union union : list) {
-            percolation.open(union.x, union.y);
-        }
-        System.out.println("percolates: " + percolation.percolates());
-    }
-
 }
