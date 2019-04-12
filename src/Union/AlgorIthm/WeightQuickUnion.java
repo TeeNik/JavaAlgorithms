@@ -1,6 +1,6 @@
-package Algorithm;
+package Union.AlgorIthm;
 
-import Model.Union;
+import Union.Model.Union;
 
 public class WeightQuickUnion {
 

@@ -1,6 +1,6 @@
-package Reader;
+package Union.Reader;
 
-import Model.Union;
+import Union.Model.Union;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

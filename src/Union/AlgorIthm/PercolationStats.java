@@ -1,4 +1,4 @@
-//package Algorithm;
+package Union.AlgorIthm;//package Union.Algorithm;
 
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;

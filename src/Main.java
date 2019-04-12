@@ -1,6 +1,6 @@
-import Algorithm.WeightQuickUnion;
-import Model.Union;
-import Reader.UnionReader;
+import Union.AlgorIthm.WeightQuickUnion;
+import Union.Model.Union;
+import Union.Reader.UnionReader;
 
 import java.util.ArrayList;
 
