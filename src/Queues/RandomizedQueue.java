@@ -19,6 +19,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
 
         @Override
+        public void remove(){
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public boolean hasNext() {
             return length != 0;
         }
@@ -71,6 +76,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Item dequeue() {
+        if(current == 0){
+            throw  new NoSuchElementException();
+        }
+
         int rand = StdRandom.uniform(current);
         Item item = array[rand];
         if(rand != current-1){
@@ -85,6 +94,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public Item sample() {
+        if(current == 0){
+            throw new NoSuchElementException();
+        }
+
         int rand = StdRandom.uniform(current);
         Item item = array[rand];
         if(current == array.length / 4){
@@ -95,21 +108,5 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Iterator<Item> iterator() {
         return new QueueIterator();
-    }
-
-    public static void main(String[] args) {
-        RandomizedQueue<Integer> queue = new RandomizedQueue<Integer>();
-        queue.enqueue(2);
-        queue.enqueue(1);
-        queue.enqueue(3);
-        queue.enqueue(4);
-        queue.enqueue(7);
-        queue.enqueue(5);
-        queue.enqueue(6);
-
-        int length = queue.size();
-        for(int i = 0; i < length; ++i){
-            System.out.println(queue.dequeue());
-        }
     }
 }

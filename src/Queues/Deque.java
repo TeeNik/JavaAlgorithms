@@ -10,12 +10,21 @@ public class Deque<Item> implements Iterable<Item>{
         private Node current = first;
 
         @Override
+        public void remove(){
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public boolean hasNext() {
             return current != null;
         }
 
         @Override
         public Item next() {
+            if(current == null){
+                throw  new NoSuchElementException();
+            }
+
             Item item = current.value;
             current = current.next;
             return item;
@@ -128,25 +137,7 @@ public class Deque<Item> implements Iterable<Item>{
         last = null;
     }
 
-    private void removePenultimate(Node from, Node to){
-        from = to;
-        from.next = null;
-        from.prev = null;
-    }
-
     public Iterator<Item> iterator() {
         return new DequeIterator();
-    }
-
-    public static void main(String[] args) {
-        Deque<Integer> deque = new Deque<>();
-        deque.addFirst(1);
-        deque.addFirst(2);
-        deque.addLast(3);
-        deque.addLast(4);
-        deque.removeFirst();
-        for(int i : deque){
-            System.out.println(i);
-        }
     }
 }
