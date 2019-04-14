@@ -1,5 +1,6 @@
-package Queues;
+//package Queues;
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.Iterator;
@@ -7,9 +8,9 @@ import java.util.NoSuchElementException;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
 
-    public class QueueIterator implements Iterator<Item>{
+    private class QueueIterator implements Iterator<Item>{
 
-        private int length = array.length;
+        private int length = current;
         private Item[] copyArray = (Item[]) new Object[length];
 
         public QueueIterator(){
@@ -25,7 +26,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
         @Override
         public boolean hasNext() {
-            return length != 0;
+            return length > 0;
         }
 
         @Override
@@ -36,9 +37,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             int rand = StdRandom.uniform(length);
             Item item = copyArray[rand];
             if(rand != length-1){
-                array[rand] = array[length-1];
+                copyArray[rand] = copyArray[length-1];
             }
-            array[length-1] = null;
+            copyArray[length-1] = null;
             --length;
             return item;
         }
@@ -68,6 +69,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public void enqueue(Item item) {
+        if (item == null){
+            throw new IllegalArgumentException();
+        }
+
         if(current == array.length){
             resize(current*2);
         }
@@ -108,5 +113,17 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     public Iterator<Item> iterator() {
         return new QueueIterator();
+    }
+
+    public static void main(String[] args){
+
+        RandomizedQueue<Integer> queue = new RandomizedQueue<Integer>();
+        for (int i = 0; i < 5; ++i){
+            queue.enqueue(i);
+        }
+
+        for (Integer i : queue) {
+            System.out.println(i);
+        }
     }
 }

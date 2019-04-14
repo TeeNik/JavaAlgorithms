@@ -1,7 +1,9 @@
-package Queues;
+//package Queues;
 
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
+
+import java.util.NoSuchElementException;
 
 public class Permutation {
     public static void main(String[] args){
@@ -9,11 +11,10 @@ public class Permutation {
         int k = Integer.parseInt(args[0]);
         RandomizedQueue<String> queue = new RandomizedQueue<>();
 
-        String str = StdIn.readString();
-        while (str != null){
-            queue.enqueue(str);
-            str = StdIn.readString();
+        while(!StdIn.isEmpty()){
+            queue.enqueue(StdIn.readString());
         }
+
 
         for (int i = 0; i < k; ++i){
             StdOut.println(queue.dequeue());

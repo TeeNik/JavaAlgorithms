@@ -1,11 +1,11 @@
-package Queues;
+//package Queues;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Deque<Item> implements Iterable<Item>{
 
-    public class DequeIterator implements Iterator<Item>{
+    private class DequeIterator implements Iterator<Item>{
 
         private Node current = first;
 
@@ -129,6 +129,7 @@ public class Deque<Item> implements Iterable<Item>{
             last.next = null;
         }
 
+        --size;
         return item;
     }
 
@@ -139,5 +140,12 @@ public class Deque<Item> implements Iterable<Item>{
 
     public Iterator<Item> iterator() {
         return new DequeIterator();
+    }
+
+    public static void main(String[] args){
+        Deque<String> queue = new Deque<>();
+        queue.addFirst("1");
+        queue.removeLast();
+        queue.addFirst("2");
     }
 }
