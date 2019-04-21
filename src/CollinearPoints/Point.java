@@ -1,14 +1,12 @@
-package CollinearPoints;
+//package CollinearPoints;
 
 import edu.princeton.cs.algs4.StdDraw;
-
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
 
     private int x;
     private int y;
-    private static final Point Origin = new Point(0,0);
 
     public Point(int x, int y){
         this.x = x;
@@ -50,10 +48,10 @@ public class Point implements Comparable<Point> {
         else if(x == that.x && y == that.y){
             return Double.NEGATIVE_INFINITY;
         }
-        return (that.y-y)/(that.x-x);
+        return (double)(that.y-y)/(double)(that.x-x);
     }
 
-    public final Comparator<Point> SLOPE_COMPARATOR = (o1, o2) -> {
+    private final Comparator<Point> SLOPE_COMPARATOR = (o1, o2) -> {
         double slope1 = slopeTo(o1);
         double slope2 = slopeTo(o2);
         return Double.compare(slope1, slope2);
@@ -63,12 +61,5 @@ public class Point implements Comparable<Point> {
         return SLOPE_COMPARATOR;
     }
 
-    public static void main(String[] args) {
-        Point p0 = new Point(0,0);
-        Point p1 = new Point(1,1);
-        Point p2 = new Point(2,2);
-        System.out.println(p0.slopeTo(p1));
-        System.out.println(p0.slopeTo(p2));
 
-    }
 }
