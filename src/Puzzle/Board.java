@@ -1,8 +1,7 @@
-package Puzzle;
+//package Puzzle;
 
 import edu.princeton.cs.algs4.StdRandom;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -14,12 +13,12 @@ public class Board {
     private int n;
 
     public Board(int[][] blocks)  {
-        this.blocks = blocks;
-        n = blocks.length;
+        this.blocks = copy(blocks);
+        n = this.blocks.length;
 
         for(int i = 0; i < n; ++i){
             for (int j = 0; j < n; ++j){
-                if(blocks[i][j] == 0) {
+                if(this.blocks[i][j] == 0) {
                     blankI = i;
                     blankJ = j;
                 }
@@ -47,8 +46,9 @@ public class Board {
         for(int i = 0; i < n; ++i){
             for (int j = 0; j < n; ++j){
                 int value = blocks[i][j];
-                int di = value / n;
-                int dj = (value -1) % n;
+                if(value == 0) continue;
+                int di = (value - 1)/ n;
+                int dj = (value - 1) % n;
                 if(i != di || j != dj){
                     manhattan += (Math.abs(i-di) + Math.abs(j-dj));
                 }
@@ -61,77 +61,83 @@ public class Board {
         for(int i = 0; i < n; ++i){
             for (int j = 0; j < n; ++j){
                 int num = i*n + j + 1;
-                if(blocks[i][j] != num) return false;
+                if(blocks[i][j] != 0 && blocks[i][j] != num) return false;
             }
         }
         return true;
     }
 
     public Board twin() {
-        int i1 = StdRandom.uniform(n);
-        int j1 = StdRandom.uniform(n);
-        int i2, j2;
-        do{
-            i2 = StdRandom.uniform(n);
-        } while (i2 != i1);
-        do{
-            j2 = StdRandom.uniform(n);
-        } while (j2 != j1);
-        int[][] twin = blocks.clone();
-        swap(twin, i1, j1, i2, j2);
-        return new Board(twin);
-
+        for (int row = 0; row < blocks.length; row++)
+            for (int col = 0; col < blocks.length - 1; col++)
+                if (blocks[row][col] != 0 && blocks[row][col+1] != 0)
+                {
+                    int[][] clone = copy(blocks);
+                    swap(clone, row, col, row, col + 1);
+                    return new Board(clone);
+                }
+        throw new RuntimeException();
     }
 
     public boolean equals(Object y)  {
-        if (y == this) return true;
-        if (y == null) return false;
-        if (y.getClass() != this.getClass()) return false;
-        Board that = (Board) y;
-        if (!Arrays.equals(this.blocks, that.blocks)) return false;
+        if (y==this) return true;
+        if (y==null || !(y instanceof Board) || ((Board)y).blocks.length != blocks.length) return false;
+        for (int row = 0; row < blocks.length; row++)
+            for (int col = 0; col < blocks.length; col++)
+                if (((Board) y).blocks[row][col] != blocks[row][col]) return false;
+
         return true;
+    }
+
+    private int[][] copy(int[][] blocks) {
+        int[][] copy = new int[blocks.length][blocks.length];
+        for (int row = 0; row < blocks.length; row++)
+            for (int col = 0; col < blocks.length; col++)
+                copy[row][col] = blocks[row][col];
+
+        return copy;
     }
 
     public Iterable<Board> neighbors() {
         LinkedList<Board> list = new LinkedList<>();
         int[][] neighbors;
         if(blankI + 1 < n){
-            neighbors = blocks.clone();
-            swapRight(neighbors);
+            neighbors = copy(blocks);
+            swapDown(neighbors);
             list.add(new Board(neighbors));
         }
-        else if(blankI > 0){
-            neighbors = blocks.clone();
-            swapLeft(neighbors);
-            list.add(new Board(neighbors));
-        }
-        if(blankJ > 0){
-            neighbors = blocks.clone();
+        if(blankI > 0){
+            neighbors = copy(blocks);
             swapUp(neighbors);
             list.add(new Board(neighbors));
         }
-        else if(blankJ + 1 < n){
-            neighbors = blocks.clone();
-            swapDown(neighbors);
+        if(blankJ > 0){
+            neighbors = copy(blocks);
+            swapLeft(neighbors);
+            list.add(new Board(neighbors));
+        }
+        if(blankJ + 1 < n){
+            neighbors = copy(blocks);
+            swapRight(neighbors);
             list.add(new Board(neighbors));
         }
         return list;
     }
 
     private void swapRight(int[][] array){
-        swap(array, blankI, blankJ, blankI+1, blankJ);
+        swap(array, blankI, blankJ, blankI, blankJ+1);
     }
 
     private void swapLeft(int[][] array){
-        swap(array, blankI, blankJ, blankI-1, blankJ);
-    }
-
-    private void swapUp(int[][] array){
         swap(array, blankI, blankJ, blankI, blankJ-1);
     }
 
+    private void swapUp(int[][] array){
+        swap(array, blankI, blankJ, blankI-1, blankJ);
+    }
+
     private void swapDown(int[][] array){
-        swap(array, blankI, blankJ, blankI, blankJ+1);
+        swap(array, blankI, blankJ, blankI+1, blankJ);
     }
 
     private void swap(int[][] array, int x1, int y1, int x2, int y2){
@@ -153,7 +159,9 @@ public class Board {
     }
 
     public static void main(String[] args){
-
+        int[][] g = {{1,0,3},{4,2,5},{7,8,6}};
+        Board board = new Board(g);
+        System.out.println(board.neighbors());
     }
 
 }
