@@ -1,24 +1,39 @@
 package Puzzle;
 
+import edu.princeton.cs.algs4.StdRandom;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class Board {
 
     private final int[][] blocks;
-    private int move;
+    private int blankI;
+    private int blankJ;
+    private int n;
 
     public Board(int[][] blocks)  {
         this.blocks = blocks;
+        n = blocks.length;
+
+        for(int i = 0; i < n; ++i){
+            for (int j = 0; j < n; ++j){
+                if(blocks[i][j] == 0) {
+                    blankI = i;
+                    blankJ = j;
+                }
+            }
+        }
     }
 
     public int dimension() {
-        return blocks.length;
+        return n;
     }
 
     public int hamming() {
-        int n = blocks.length;
-        int hamming = move;
-        for(int i = 0; i < n){
+        int hamming = 0;
+        for(int i = 0; i < n; ++i){
             for (int j = 0; j < n; ++j){
                 int num = i*n + j + 1;
                 if(blocks[i][j] != 0 && blocks[i][j] != num) ++hamming;
@@ -28,10 +43,8 @@ public class Board {
     }
 
     public int manhattan() {
-        int manhattan = move;
-        int n = blocks.length;
-
-        for(int i = 0; i < n){
+        int manhattan = 0;
+        for(int i = 0; i < n; ++i){
             for (int j = 0; j < n; ++j){
                 int value = blocks[i][j];
                 int di = value / n;
@@ -45,10 +58,28 @@ public class Board {
     }
 
     public boolean isGoal() {
-
+        for(int i = 0; i < n; ++i){
+            for (int j = 0; j < n; ++j){
+                int num = i*n + j + 1;
+                if(blocks[i][j] != num) return false;
+            }
+        }
+        return true;
     }
 
     public Board twin() {
+        int i1 = StdRandom.uniform(n);
+        int j1 = StdRandom.uniform(n);
+        int i2, j2;
+        do{
+            i2 = StdRandom.uniform(n);
+        } while (i2 != i1);
+        do{
+            j2 = StdRandom.uniform(n);
+        } while (j2 != j1);
+        int[][] twin = blocks.clone();
+        swap(twin, i1, j1, i2, j2);
+        return new Board(twin);
 
     }
 
@@ -62,11 +93,63 @@ public class Board {
     }
 
     public Iterable<Board> neighbors() {
+        LinkedList<Board> list = new LinkedList<>();
+        int[][] neighbors;
+        if(blankI + 1 < n){
+            neighbors = blocks.clone();
+            swapRight(neighbors);
+            list.add(new Board(neighbors));
+        }
+        else if(blankI > 0){
+            neighbors = blocks.clone();
+            swapLeft(neighbors);
+            list.add(new Board(neighbors));
+        }
+        if(blankJ > 0){
+            neighbors = blocks.clone();
+            swapUp(neighbors);
+            list.add(new Board(neighbors));
+        }
+        else if(blankJ + 1 < n){
+            neighbors = blocks.clone();
+            swapDown(neighbors);
+            list.add(new Board(neighbors));
+        }
+        return list;
+    }
 
+    private void swapRight(int[][] array){
+        swap(array, blankI, blankJ, blankI+1, blankJ);
+    }
+
+    private void swapLeft(int[][] array){
+        swap(array, blankI, blankJ, blankI-1, blankJ);
+    }
+
+    private void swapUp(int[][] array){
+        swap(array, blankI, blankJ, blankI, blankJ-1);
+    }
+
+    private void swapDown(int[][] array){
+        swap(array, blankI, blankJ, blankI, blankJ+1);
+    }
+
+    private void swap(int[][] array, int x1, int y1, int x2, int y2){
+        int temp = array[x1][y1];
+        array[x1][y1] = array[x2][y2];
+        array[x2][y2] = temp;
     }
 
     public String toString() {
-
+        StringBuilder s = new StringBuilder();
+        s.append(n + "\n");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                s.append(String.format("%2d ", blocks[i][j]));
+            }
+            s.append("\n");
+        }
+        return s.toString();
     }
 
     public static void main(String[] args){
