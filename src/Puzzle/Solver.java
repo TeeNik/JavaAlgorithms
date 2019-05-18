@@ -1,4 +1,4 @@
-//package Puzzle;
+package Puzzle;
 
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdIn;
@@ -31,14 +31,14 @@ public class Solver {
     }
 
     private Move lastMove;
-    private Deque<Board> solution;
+    private MinPQ<Board> solution;
     private int numMoves;
 
     public Solver(Board initial) {
 
         if(initial == null) throw new IllegalArgumentException();
 
-        solution = new Stack<>();
+        solution = new MinPQ<Board>();
 
         MinPQ<Move> moves = new MinPQ<>();
         moves.insert(new Move(initial));
@@ -53,9 +53,9 @@ public class Solver {
 
         numMoves = lastMove != null ? lastMove.numMoves : -1;
 
-        solution = new Deque<Board>();
+        solution = new MinPQ<Board>();
         while(lastMove != null) {
-            solution.addFirst(lastMove.board);
+            solution.insert(lastMove.board);
             lastMove = lastMove.previous;
         }
 
