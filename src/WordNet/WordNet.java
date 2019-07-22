@@ -1,139 +1,119 @@
+
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.KosarajuSharirSCC;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WordNet {
 
     private HashMap<Integer, String> synsets;
-    private HashMap<String, Node> nouns;
-    private int numSynsets;
+    private HashMap<String, Set<Integer>> nouns;
     private Digraph hypernym;
     private SAP sap;
 
-    private class Node {
-        private int id;
-        private Node next;
 
-        public Node(int id){
-            this.id = id;
-        }
-    }
-
-    public WordNet(String synsets, String hypernyms){
+    public WordNet(String synsets, String hypernyms) {
         this.synsets = new HashMap<>();
         this.nouns = new HashMap<>();
 
         getSynsets(synsets);
         getHypernyms(hypernyms);
+
+        DirectedCycle cycle = new DirectedCycle(hypernym);
+        if (cycle.hasCycle() || !rootedDAG(hypernym)) {
+            throw new IllegalArgumentException();
+        }
+
+        sap = new SAP(hypernym);
     }
 
-    private void getSynsets(String path){
+    private void getSynsets(String path) {
         In in = new In(path);
 
         while (!in.isEmpty()){
             String line = in.readLine();
             String[] fields = line.split(",");
             String[] nounList = fields[1].split(" ");
-
-            for (int i = 0; i < nounList.length; ++i){
-                String noun = nounList[i];
-                Integer id = Integer.parseInt(fields[0]);
-                if(nouns.containsKey(noun)){
-                    Node temp = nouns.get(noun);
-                    Node first = temp;
-
-                    while (temp.next != null) {
-                        temp = temp.next;
-                    }
-
-                    temp.next = new Node(id);
-                    nouns.put(noun, first);
-                } else {
-                    nouns.put(noun, new Node(id));
-                }
-                synsets.put(Integer.parseInt(fields[0]), fields[1]);
-                numSynsets++;
-            }
-        }
-    }
-
-    private void getHypernyms(String path){
-        hypernym = new Digraph(numSynsets);
-        In in = new In(path);
-        int roots = 0;
-        boolean[] rootCheck = new boolean[numSynsets];
-
-        while (!in.isEmpty()){
-            String line = in.readLine();
-            String[] fields = line.split(",");
-            int length = fields.length;
-            if(length == 1){
-                roots++;
-            }
             Integer id = Integer.parseInt(fields[0]);
-            rootCheck[id] = true;
-            for (int i = 1; i < length; ++i){
-                hypernym.addEdge(id, Integer.parseInt(fields[i]));
+
+            synsets.put(id, fields[1]);
+
+            for (String noun : nounList) {
+                Set<Integer> ids = nouns.get(noun);
+                if (ids == null) {
+                    ids = new HashSet<>();
+                }
+                ids.add(id);
+                nouns.put(noun, ids);
             }
         }
-
-        for (int i = 0; i < rootCheck.length; ++i){
-            if(!rootCheck[i]) ++roots;
-        }
-
-        if(roots != 1) throw new IllegalArgumentException();
-
-        KosarajuSharirSCC testDAG = new KosarajuSharirSCC(hypernym);
-        if(testDAG.count() > numSynsets){
-            throw new IllegalArgumentException();
-        }
-        sap = new SAP(hypernym);
     }
 
-         public Iterable<String> nouns(){
+    private boolean rootedDAG(Digraph g) {
+        int roots = 0;
+        for (int i = 0; i < g.V(); i++) {
+            if (!g.adj(i).iterator().hasNext()) {
+                roots++;
+                if (roots > 1) {
+                    return false;
+                }
+            }
+        }
+        return roots == 1;
+    }
+
+    private void getHypernyms(String path) {
+        hypernym = new Digraph(synsets.size());
+        In in = new In(path);
+
+        while (!in.isEmpty()) {
+            String[] line = in.readLine().split(",");
+            Integer id = Integer.valueOf(line[0]);
+            for (int i = 1; i < line.length; ++i) {
+                Integer edge = Integer.valueOf(line[i]);
+                hypernym.addEdge(id, edge);
+            }
+        }
+    }
+
+    public Iterable<String> nouns() {
         return nouns.keySet();
     }
-    public boolean isNoun(String word){
+
+    public boolean isNoun(String word) {
         if (word != null) return nouns.containsKey(word);
-        else throw new java.lang.NullPointerException();
+        else throw new java.lang.IllegalArgumentException();
     }
 
-    public int distance(String nounA, String nounB){
-        
-    }
-
-    public String sap(String nounA, String nounB){
+    public int distance(String nounA, String nounB) {
         if(!isNoun(nounA) || !isNoun(nounB)){
             throw new IllegalArgumentException();
         }
+        Iterable<Integer> it0 = nouns.get(nounA);
+        Iterable<Integer> it1 = nouns.get(nounB);
 
-        Iterable<Integer> itA = getIter(nounA);
-        Iterable<Integer> itB = getIter(nounB);
+        return sap.length(it0, it1);
     }
 
-    private Iterable<Integer> getIter(final String noun) {
-        return () -> new Iterator<>() {
-            Node curr = nouns.get(noun);
+    public String sap(String nounA, String nounB) {
+        if(!isNoun(nounA) || !isNoun(nounB)){
+            throw new IllegalArgumentException();
+        }
+        Iterable<Integer> itA = nouns.get(nounA);
+        Iterable<Integer> itB = nouns.get(nounB);
 
-            public boolean hasNext() {
-                return curr != null;
-            }
-
-            public Integer next() {
-                Integer val = curr.id;
-                curr = curr.next;
-                return val;
-            }
-
-            public void remove() {
-            }
-        };
+        return synsets.get(sap.ancestor(itA, itB));
     }
 
-    public static void main(String[] args){
-
+    public static void main(String[] args) {
+        WordNet wordnet = new WordNet("synsets.txt", "hypernyms.txt");
+        StdOut.println("Number of synsets: " + wordnet.synsets.size());
+        assert !wordnet.isNoun("zzyzyzz");
+        assert wordnet.isNoun("subpart");
+        StdOut.println(wordnet.sap("worm", "bird"));
     }
 }
