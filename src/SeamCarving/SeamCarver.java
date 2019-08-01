@@ -1,14 +1,12 @@
 import edu.princeton.cs.algs4.Picture;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class SeamCarver {
 
-    private final double BORDER_ENERGY = 195075.0;
-
     private Picture picture;
+    private final static double BORDER_ENERGY = 1000;
 
-    // create a seam carver object based on the given picture
     public SeamCarver(Picture picture){
         if (picture == null) {
             throw new IllegalArgumentException("Picture cannot be null");
@@ -17,28 +15,29 @@ public class SeamCarver {
         this.picture = new Picture(picture);;
     }
 
-    // current picture
     public Picture picture(){
-        return picture;
+        return new Picture(picture);
     }
 
-    // width of current picture
     public int width(){
         return picture.width();
     }
 
-    // height of current picture
     public int height(){
         return picture.height();
     }
 
-    // energy of pixel at column x and row y
     public double energy(int x, int y){
-        if (x == 0 || y == 0 || x == (width() - 1) || y == (height() - 1)) {
-            return 3 * 255 * 255;
+
+        if(x < 0 || x > width() - 1 || y < 0 || y > height() -1){
+            throw new IllegalArgumentException();
         }
 
-        return deltaX(x, y) + deltaY(x, y);
+        if (x == 0 || y == 0 || x == (width() - 1) || y == (height() - 1)) {
+            return BORDER_ENERGY;
+        }
+
+        return Math.sqrt(deltaX(x, y) + deltaY(x, y));
     }
 
     private double deltaX(int x, int y) {
@@ -67,7 +66,6 @@ public class SeamCarver {
         return energy;
     }
 
-    // sequence of indices for horizontal seam
     public int[] findHorizontalSeam(){
         double[][] energyMatrix = buildEnergyMatrix();
         return findSeam(energyMatrix, width(), height());
@@ -146,13 +144,11 @@ public class SeamCarver {
         return mt;
     }
 
-    // sequence of indices for vertical seam
     public int[] findVerticalSeam(){
         double[][] energyMatrix = transpose(buildEnergyMatrix());
         return findSeam(energyMatrix, height(), width());
     }
 
-    // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam){
         if (seam == null || seam.length != width()) {
             throw new IllegalArgumentException("Invalid seam");
@@ -172,7 +168,6 @@ public class SeamCarver {
         this.picture = newPicture;
     }
 
-    // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam){
         if (seam == null || seam.length != height()) {
             throw new IllegalArgumentException("Invalid seam");
@@ -200,7 +195,6 @@ public class SeamCarver {
         }
     }
 
-    //  unit testing (optional)
     public static void main(String[] args){
 
     }
