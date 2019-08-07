@@ -1,8 +1,12 @@
 import edu.princeton.cs.algs4.Bag;
+import edu.princeton.cs.algs4.FlowEdge;
+import edu.princeton.cs.algs4.FlowNetwork;
+import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class BaseballElimination {
 
@@ -77,11 +81,77 @@ public class BaseballElimination {
     }
 
     public  boolean isEliminated(String team) {
-        
+        checkTeam(team);
+
+        boolean flag = false;
+        subset = new Bag<String>();
+        // trivial elimination
+        for (Iterator<String> teams = teams().iterator(); teams.hasNext();) {
+            String current = teams.next();
+            if (wins(team) + remaining(team) < wins(current)) {
+                subset.add(current);
+                checked = true;
+                return true;
+            }
+        }
+        flag = flowCheck(team);
+        checked = true;
+        return flag;
+    }
+
+    private int numGameCombos(int x){
+        int n = x - 1;
+        return n*(n-1)/2;
+    }
+
+    private boolean flowCheck(String team) {
+        // initialize flow network with source [size-2] and sink [size-1]
+        int gameCombos = numGameCombos(numOfTeams);
+        int size = 2+numOfTeams+gameCombos-1;
+        int teamNumber = teams.get(team)[0];
+        FlowNetwork network = new FlowNetwork(size);
+
+        // add edges for source to game combination vertices to teams
+        int x = 0; int y = 0; int z = 0; int sum = 0; String[] networkTeams = new String[numOfTeams-1];
+        for (int i = 0; i < numOfTeams; i++) {
+            if (i != teamNumber) {
+                for (int j = 0; j < numOfTeams; j++) {
+                    if (j != teamNumber && j > i) {
+                        network.addEdge(new FlowEdge(size-2, x, against[i][j]));
+                        sum += against[i][j];
+                        network.addEdge(new FlowEdge(x, size-1-numOfTeams+y, Double.POSITIVE_INFINITY));
+                        network.addEdge(new FlowEdge(x, size-numOfTeams+z, Double.POSITIVE_INFINITY));
+                        x++; z++;
+                    }
+                }
+
+                int weight = wins(team) + remaining(team) - wins[i];
+                network.addEdge(new FlowEdge(size-1-numOfTeams+y, size-1, weight));
+                networkTeams[y] = teamNumbers.get(i);
+
+                y++; z = y;
+            }
+        }
+
+        // calculate maxflow using FF
+        FordFulkerson ff = new FordFulkerson(network, size-2, size-1);
+        if (sum == ff.value()) return false;
+        else {
+            for (int v = gameCombos; v < size-2; v++) {
+                if (ff.inCut(v)) {
+                    subset.add(networkTeams[v-gameCombos]);
+                }
+            }
+            return true;
+        }
     }
 
     public Iterable<String> certificateOfElimination(String team) {
+        checkTeam(team);
 
+        boolean flag = isEliminated(team);
+        if (flag) return subset;
+        else return null;
     }
 
     private void checkTeam(String team) {
