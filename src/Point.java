@@ -22,7 +22,7 @@ public class Point implements Comparable<Point> {
     }
     // string representation
     public String toString() {
-        return null;
+        return "(" + x + ", " + y + ")";
     }
     // compare two points by y-coordinates, breaking ties by x-coordinates
     public int compareTo(Point that) {

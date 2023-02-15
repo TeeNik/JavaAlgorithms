@@ -11,9 +11,10 @@ public class LineSegment {
     }
     // draws this line segment
     public void draw() {
+        a.drawTo(b);
     }
     // string representation
     public String toString() {
-        return null;
+        return a + " -> " + b;
     }
 }
