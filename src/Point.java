@@ -1,17 +1,24 @@
+import edu.princeton.cs.algs4.StdDraw;
+
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
+
+    private final int x;
+    private final int y;
+
     // constructs the point (x, y)
     public Point(int x, int y) {
-
+        this.x = x;
+        this.y = y;
     }
     // draws this point
     public void draw() {
-
+        StdDraw.point(x, y);
     }
     // draws the line segment from this point to that point
     public void drawTo(Point that) {
-
+        StdDraw.line(x, y, that.x, that.y);
     }
     // string representation
     public String toString() {
@@ -19,14 +26,44 @@ public class Point implements Comparable<Point> {
     }
     // compare two points by y-coordinates, breaking ties by x-coordinates
     public int compareTo(Point that) {
-        return 0;
+        if (y > that.y) {
+            return 1;
+        }
+        else if (y == that.y) {
+            if(x > that.x) {
+                return 1;
+            }
+        }
+        return -1;
     }
     // the slope between this point and that point
     public double slopeTo(Point that) {
-        return 0;
+        if (x == that.x) {
+            if (y == that.y) {
+                return Double.NEGATIVE_INFINITY;
+            }
+            else if (x == that.x) {
+                return Double.POSITIVE_INFINITY;
+            }
+        }
+        if (y == that.y) {
+            return 0;
+        }
+        return (y - that.y) / (x - that.x);
     }
     // compare two points by slopes they make with this point
     public Comparator<Point> slopeOrder() {
-        return null;
+        return new SlopeComparator();
+    }
+
+    private class SlopeComparator implements Comparator<Point> {
+        @Override
+        public int compare(Point a, Point b) {
+            final double slopeA = slopeTo(a);
+            final double slopeB = slopeTo(b);
+            if (slopeA < slopeB) return -1;
+            if (slopeA > slopeB) return 1;
+            return 0;
+        }
     }
 }
