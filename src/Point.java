@@ -14,7 +14,8 @@ public class Point implements Comparable<Point> {
     }
     // draws this point
     public void draw() {
-        StdDraw.point(x, y);
+        //StdDraw.point(x, y);
+        StdDraw.circle(x, y, 200);
     }
     // draws the line segment from this point to that point
     public void drawTo(Point that) {
@@ -49,7 +50,7 @@ public class Point implements Comparable<Point> {
         if (y == that.y) {
             return 0;
         }
-        return (y - that.y) / (x - that.x);
+        return (double)(that.y - y) / (double)(that.x - x);
     }
     // compare two points by slopes they make with this point
     public Comparator<Point> slopeOrder() {
