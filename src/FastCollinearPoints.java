@@ -2,22 +2,23 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
-import javax.sound.sampled.Line;
-import javax.swing.text.Segment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 public class FastCollinearPoints {
 
-    LineSegment[] segments;
+    private LineSegment[] segments;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
 
+        checkNull(points);
+
         Point[] sortedPoints = Arrays.copyOf(points, points.length);
         Arrays.sort(sortedPoints);
+
+        checkDuplicates(sortedPoints);
 
         final int N = points.length;
         final ArrayList<LineSegment> segmentsList = new ArrayList<>();
@@ -50,7 +51,7 @@ public class FastCollinearPoints {
     }
     // the line segments
     public LineSegment[] segments() {
-        return segments;
+        return Arrays.copyOf(segments, segments.length);
     }
 
     private void checkNull(Point[] points) {
@@ -66,7 +67,6 @@ public class FastCollinearPoints {
 
     private void checkDuplicates(Point[] sortedPoints) {
         for (int i = 0; i < sortedPoints.length - 1; i++) {
-            Point p = sortedPoints[i];
             if (sortedPoints[i].compareTo(sortedPoints[i + 1]) == 0) {
                 throw new IllegalArgumentException();
             }
