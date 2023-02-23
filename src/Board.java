@@ -1,5 +1,8 @@
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Board {
 
 
@@ -80,30 +83,89 @@ public class Board {
         int n = 1;
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++ j) {
-                if (i == blankI && j == blankJ) {
-                    continue;
+                if(!(tiles[i][j] == n || n == size * size))
+                {
+                    return false;
                 }
-                int value = tiles[i][j] - 1;
-                int desiredI = value / size;
-                int desiredJ = value % size;
-                m += (Math.abs(i - desiredI) + Math.abs(j - desiredJ));
             }
         }
+        return true;
     }
 
     // does this board equal y?
     public boolean equals(Object y) {
-        return false;
+        if (this == y) return true;
+        if (y == null) return false;
+        if (y.getClass() != this.getClass()) return false;
+
+        Board that = (Board) y;
+        if(size != that.size) return false;
+
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
+                if (tiles[i][j] != that.tiles[i][j]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        return null;
+        ArrayList<Board> neighborsList = new ArrayList<>();
+        if (blankI > 0) {
+            int[][] newTiles = copyTiles();
+            swap(newTiles, blankI, blankJ, blankI - 1, blankJ);
+            neighborsList.add(new Board(newTiles));
+        }
+        if (blankI < size - 1) {
+            int[][] newTiles = copyTiles();
+            swap(newTiles, blankI, blankJ, blankI + 1, blankJ);
+            neighborsList.add(new Board(newTiles));
+        }
+        if (blankJ > 0) {
+            int[][] newTiles = copyTiles();
+            swap(newTiles, blankI, blankJ, blankI, blankJ - 1);
+            neighborsList.add(new Board(newTiles));
+        }
+        if (blankJ < size -1) {
+            int[][] newTiles = copyTiles();
+            swap(newTiles, blankI, blankJ, blankI, blankJ + 1);
+            neighborsList.add(new Board(newTiles));
+        }
+        return neighborsList;
     }
 
     // a board that is obtained by exchanging any pair of tiles
     public Board twin() {
-        return null;
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size - 1; ++j) {
+                if (tiles[i][j] != 0 && tiles[i][j + 1] != 0) {
+                    int[][] newTiles = copyTiles();
+                    swap(newTiles, i, j, i, j + 1);
+                    return new Board(newTiles);
+                }
+            }
+        }
+        throw new RuntimeException();
+    }
+
+    private int[][] copyTiles() {
+        int[][] newTiles = new int[size][size];
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++j) {
+                newTiles[i][j] = tiles[i][j];
+            }
+        }
+        return tiles;
+    }
+
+    private void swap(int[][] array, int x1, int y1, int x2, int y2) {
+        int temp = array[x1][y1];
+        array[x1][y1] = array[x2][y2];
+        array[x2][y2] = temp;
     }
 
     // unit testing (not graded)
