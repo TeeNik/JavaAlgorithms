@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Board {
-
-
     private int tiles[][];
     private int size;
     private int blankI;
