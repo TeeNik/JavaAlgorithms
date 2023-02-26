@@ -9,10 +9,13 @@ public class Board {
     private int blankI;
     private int blankJ;
 
+    private int manhattan = 0;
+    private int hamming = 0;
+
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] tiles) {
-        this.tiles = tiles;
+        this.tiles = copy(tiles);
         size = tiles.length;
 
         for (int i = 0; i < size; ++i) {
@@ -24,6 +27,9 @@ public class Board {
                 }
             }
         }
+
+        calculateHamming();
+        calculateManhattan();
     }
 
     // string representation of this board
@@ -46,22 +52,27 @@ public class Board {
 
     // number of tiles out of place
     public int hamming() {
-        int h = 0;
-        int n = 1;
-        for (int[] line : tiles) {
-            for (int tile : line) {
-                if(tile == n && tile != 0) {
-                    ++h;
-                }
-                ++n;
-            }
-        }
-        return h;
+        return hamming;
     }
 
     // sum of Manhattan distances between tiles and goal
     public int manhattan() {
-        int m = 0;
+        return manhattan;
+    }
+
+    private void calculateHamming() {
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < size; ++ j) {
+                int n = i * size + j + 1;
+                if(tiles[i][j] != n && tiles[i][j] != 0)
+                {
+                    ++hamming;
+                }
+            }
+        }
+    }
+
+    private void calculateManhattan() {
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++ j) {
                 if (i == blankI && j == blankJ) {
@@ -70,18 +81,17 @@ public class Board {
                 int value = tiles[i][j] - 1;
                 int desiredI = value / size;
                 int desiredJ = value % size;
-                m += (Math.abs(i - desiredI) + Math.abs(j - desiredJ));
+                manhattan += (Math.abs(i - desiredI) + Math.abs(j - desiredJ));
             }
         }
-        return m;
     }
 
     // is this board the goal board?
     public boolean isGoal() {
-        int n = 1;
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size; ++ j) {
-                if(!(tiles[i][j] == n || n == size * size))
+                int n = i * size + j + 1;
+                if(tiles[i][j] != n && tiles[i][j] != 0)
                 {
                     return false;
                 }
@@ -114,22 +124,22 @@ public class Board {
     public Iterable<Board> neighbors() {
         ArrayList<Board> neighborsList = new ArrayList<>();
         if (blankI > 0) {
-            int[][] newTiles = copyTiles();
+            int[][] newTiles = copy(tiles);
             swap(newTiles, blankI, blankJ, blankI - 1, blankJ);
             neighborsList.add(new Board(newTiles));
         }
         if (blankI < size - 1) {
-            int[][] newTiles = copyTiles();
+            int[][] newTiles = copy(tiles);
             swap(newTiles, blankI, blankJ, blankI + 1, blankJ);
             neighborsList.add(new Board(newTiles));
         }
         if (blankJ > 0) {
-            int[][] newTiles = copyTiles();
+            int[][] newTiles = copy(tiles);
             swap(newTiles, blankI, blankJ, blankI, blankJ - 1);
             neighborsList.add(new Board(newTiles));
         }
         if (blankJ < size -1) {
-            int[][] newTiles = copyTiles();
+            int[][] newTiles = copy(tiles);
             swap(newTiles, blankI, blankJ, blankI, blankJ + 1);
             neighborsList.add(new Board(newTiles));
         }
@@ -141,7 +151,7 @@ public class Board {
         for (int i = 0; i < size; ++i) {
             for (int j = 0; j < size - 1; ++j) {
                 if (tiles[i][j] != 0 && tiles[i][j + 1] != 0) {
-                    int[][] newTiles = copyTiles();
+                    int[][] newTiles = copy(tiles);
                     swap(newTiles, i, j, i, j + 1);
                     return new Board(newTiles);
                 }
@@ -150,14 +160,14 @@ public class Board {
         throw new RuntimeException();
     }
 
-    private int[][] copyTiles() {
-        int[][] newTiles = new int[size][size];
-        for (int i = 0; i < size; ++i) {
-            for (int j = 0; j < size; ++j) {
+    private int[][] copy(int[][] tiles) {
+        int[][] newTiles = new int[tiles.length][tiles.length];
+        for (int i = 0; i < tiles.length; ++i) {
+            for (int j = 0; j < tiles.length; ++j) {
                 newTiles[i][j] = tiles[i][j];
             }
         }
-        return tiles;
+        return newTiles;
     }
 
     private void swap(int[][] array, int x1, int y1, int x2, int y2) {
@@ -168,6 +178,10 @@ public class Board {
 
     // unit testing (not graded)
     public static void main(String[] args) {
-
+        int[][] tiles = {{1,0,8},{2,4,6},{3,5,7}};
+        Board board = new Board(tiles);
+        for (Board b : board.neighbors()) {
+            StdOut.println(b);
+        }
     }
 }

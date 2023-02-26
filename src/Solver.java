@@ -3,6 +3,10 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+
 public class Solver {
 
     private class Move implements Comparable<Move> {
@@ -10,24 +14,27 @@ public class Solver {
         private Move previous;
         private Board board;
         private int numOfMoves = 0;
+        private int manhattan = 0;
 
         private Move(Board board) {
             this.board = board;
+            manhattan = board.manhattan();
         }
         private Move(Board board, Move previous) {
             this.board = board;
             this.previous = previous;
             numOfMoves = previous.numOfMoves + 1;
+            manhattan = board.manhattan();
         }
 
         @Override
         public int compareTo(Move move) {
-            return (this.board.manhattan() - move.board.manhattan()) + (this.numOfMoves - move.numOfMoves);
+            return (this.manhattan - move.manhattan) + (this.numOfMoves - move.numOfMoves);
         }
     }
 
     private Move lastMove;
-    private MinPQ<Board> solution;
+    private Deque<Board> solution = null;
     private int numOfMoves;
 
     // find a solution to the initial board (using the A* algorithm)
@@ -48,18 +55,21 @@ public class Solver {
         }
 
         numOfMoves = lastMove != null ? lastMove.numOfMoves : -1;
-
-        solution = new MinPQ<Board>();
-        while (lastMove != null) {
-            solution.insert(lastMove.board);
-            lastMove = lastMove.previous;
+        if(numOfMoves >= 0) {
+            solution = new LinkedList<>();
+            while (lastMove != null) {
+                solution.addFirst(lastMove.board);
+                lastMove = lastMove.previous;
+            }
         }
+
+
     }
 
     private Move nextMove(MinPQ<Move> pq) {
         Move best = pq.delMin();
         if(best.board.isGoal()) {
-            return  best;
+            return best;
         }
         for (Board neighbor : best.board.neighbors()) {
             if (best.previous == null || !neighbor.equals(best.previous.board)) {
@@ -71,7 +81,7 @@ public class Solver {
 
     // is the initial board solvable? (see below)
     public boolean isSolvable() {
-        return lastMove != null;
+        return solution != null;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
