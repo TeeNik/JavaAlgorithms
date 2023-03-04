@@ -27,11 +27,13 @@ public class PointSET {
 
     // add the point to the set (if it is not already in the set)
     public void insert(Point2D p) {
+        checkNull(p);
         set.add(p);
     }
 
     // does the set contain point p?
     public boolean contains(Point2D p) {
+        checkNull(p);
         return set.contains(p);
     }
 
@@ -44,6 +46,7 @@ public class PointSET {
 
     // all points that are inside the rectangle (or on the boundary)
     public Iterable<Point2D> range(RectHV rect) {
+        checkNull(rect);
 
         Point2D min = new Point2D(rect.xmin(), rect.ymin());
         Point2D max = new Point2D(rect.xmax(), rect.ymax());
@@ -61,6 +64,8 @@ public class PointSET {
 
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D target) {
+        checkNull(target);
+
         Point2D result = null;
         double minDist = Double.MAX_VALUE;
 
@@ -73,6 +78,12 @@ public class PointSET {
         }
 
         return result;
+    }
+
+    private void checkNull(Object o) {
+        if (o == null) {
+            throw new IllegalArgumentException();
+        }
     }
 
     // unit testing of the methods (optional)
