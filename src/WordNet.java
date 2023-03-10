@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
 
 import java.util.HashMap;
@@ -24,6 +25,11 @@ public class WordNet {
         readSynsets(hypernyms);
         readHypernyms(synsets);
 
+        DirectedCycle cycle = new DirectedCycle(this.hypernyms);
+        if (cycle.hasCycle() && !rootedDAG(this.hypernyms)) {
+            throw new IllegalArgumentException();
+        }
+
         sap = new SAP(this.hypernyms);
     }
 
@@ -39,6 +45,10 @@ public class WordNet {
 
     // distance between nounA and nounB (defined below)
     public int distance(String nounA, String nounB) {
+        if (!isNoun(nounA) || !isNoun(nounB)) {
+            throw new IllegalArgumentException();
+        }
+
         Iterable<Integer> itA = nouns.get(nounA);
         Iterable<Integer> itB = nouns.get(nounB);
 
@@ -48,6 +58,10 @@ public class WordNet {
     // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
     // in a shortest ancestral path (defined below)
     public String sap(String nounA, String nounB) {
+        if (!isNoun(nounA) || !isNoun(nounB)) {
+            throw new IllegalArgumentException();
+        }
+
         Iterable<Integer> itA = nouns.get(nounA);
         Iterable<Integer> itB = nouns.get(nounB);
 
@@ -74,6 +88,19 @@ public class WordNet {
                 nouns.put(noun, ids);
             }
         }
+    }
+
+    private boolean rootedDAG(Digraph g) {
+        int roots = 0;
+        for (int i = 0; i < g.V(); ++i) {
+            if (!g.adj(i).iterator().hasNext()) {
+                ++roots;
+                if (roots > 0) {
+                    return false;
+                }
+            }
+        }
+        return roots == 1;
     }
 
     private void readHypernyms(String path) {

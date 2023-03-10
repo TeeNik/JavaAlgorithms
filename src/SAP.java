@@ -1,7 +1,9 @@
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class SAP {
     private final Digraph sap;
@@ -36,6 +38,8 @@ public class SAP {
     }
 
     private void bfdp(Iterable<Integer> v, Iterable<Integer> w) {
+        checkBounds(v, w);
+
         BreadthFirstDirectedPaths bfdpV = new BreadthFirstDirectedPaths(sap, v);
         BreadthFirstDirectedPaths bfdpW = new BreadthFirstDirectedPaths(sap, w);
 
@@ -45,7 +49,7 @@ public class SAP {
         for (int i = 0; i < sap.V(); ++i) {
             if (bfdpV.hasPathTo(i) && bfdpW.hasPathTo(i)) {
                 int dist = bfdpV.distTo(i) + bfdpW.distTo(i);
-                if (minDist < dist) {
+                if (minDist < 0 || dist < minDist) {
                     minDist = dist;
                     ancestor = i;
                 }
@@ -53,8 +57,42 @@ public class SAP {
         }
     }
 
+    private void checkBounds(Integer v, Integer w) {
+        if (v == null || v < 0 || v > sap.V() - 1) {
+            throw new IllegalArgumentException();
+        }
+
+        if (w == null || w < 0 || w > sap.V() - 1) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void checkBounds(Iterable<Integer> v, Iterable<Integer> w) {
+        if ( v == null || w == null ) {
+            throw new IllegalArgumentException();
+        }
+
+        Iterator<Integer> iter = v.iterator();
+        while (iter.hasNext()) {
+            Integer tmp = iter.next();
+            if (tmp == null || tmp < 0 || tmp > sap.V() - 1) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        iter = w.iterator();
+        while (iter.hasNext()) {
+            Integer tmp = iter.next();
+            if (tmp == null || tmp < 0 || tmp > sap.V() - 1) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
     // do unit testing of this class
     public static void main(String[] args) {
-
+        ArrayList empty = new ArrayList();
+        SAP sap = new SAP(new Digraph(10));
+        sap.checkBounds(empty, empty);
     }
 }
