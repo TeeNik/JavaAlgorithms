@@ -17,24 +17,40 @@ public class SAP {
 
     // length of shortest ancestral path between v and w; -1 if no such path
     public int length(int v, int w) {
-        return length(Arrays.asList(new Integer[] {v}), Arrays.asList(new Integer[] {w}));
+        validateVertex(v);
+        validateVertex(w);
+        bfdp(v, w);
+        return minDist;
     }
 
     // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
     public int ancestor(int v, int w) {
-        return ancestor(Arrays.asList(new Integer[] {v}), Arrays.asList(new Integer[] {w}));
+        validateVertex(v);
+        validateVertex(w);
+        bfdp(v, w);
+        return ancestor;
     }
 
     // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
+        validateVertices(v);
+        validateVertices(w);
         bfdp(v, w);
         return minDist;
     }
 
     // a common ancestor that participates in shortest ancestral path; -1 if no such path
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
+        validateVertices(v);
+        validateVertices(w);
         bfdp(v, w);
         return ancestor;
+    }
+
+    private void bfdp(Integer v, Integer w) {
+        checkBounds(v, w);
+        bfdp(Arrays.asList(new Integer[] {v}), Arrays.asList(new Integer[] {w}));
+
     }
 
     private void bfdp(Iterable<Integer> v, Iterable<Integer> w) {
@@ -84,6 +100,24 @@ public class SAP {
         while (iter.hasNext()) {
             Integer tmp = iter.next();
             if (tmp == null || tmp < 0 || tmp > sap.V() - 1) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    // throw an IllegalArgumentException unless {@code 0 <= v < V}
+    private void validateVertex(int v) {
+        if (v < 0 || v >= sap.V())
+            throw new IllegalArgumentException();
+    }
+
+    // throw an IllegalArgumentException unless {@code 0 <= v < V}
+    private void validateVertices(Iterable<Integer> vertices) {
+        if (vertices == null) {
+            throw new IllegalArgumentException();
+        }
+        for (Integer v : vertices) {
+            if (v == null || v < 0 || v >= sap.V()) {
                 throw new IllegalArgumentException();
             }
         }
