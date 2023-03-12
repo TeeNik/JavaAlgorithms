@@ -12,16 +12,19 @@ public class Outcast {
         String outcast = null;
         int max = 0;
 
-        for (int i = 0; i < nouns.length; ++i) {
+        for (String nounA : nouns) {
             int dist = 0;
-            for (int j = i + 1; j < nouns.length; ++j) {
-                dist += wordnet.distance(nouns[i], nouns[j]);
+            for (String nounB : nouns) {
+                if (!nounA.equals(nounB)) {
+                    dist += wordnet.distance(nounA, nounB);
+                }
             }
             if (dist > max) {
                 max = dist;
-                outcast = nouns[i];
+                outcast = nounA;
             }
         }
+
         return outcast;
     }
 

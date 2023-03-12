@@ -1,7 +1,6 @@
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -35,6 +34,11 @@ public class SAP {
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
         validateVertices(v);
         validateVertices(w);
+
+        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
+            return -1;
+        }
+
         bfdp(v, w);
         return minDist;
     }
@@ -43,6 +47,9 @@ public class SAP {
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
         validateVertices(v);
         validateVertices(w);
+        if (!v.iterator().hasNext() || !w.iterator().hasNext()) {
+            return -1;
+        }
         bfdp(v, w);
         return ancestor;
     }
@@ -125,8 +132,6 @@ public class SAP {
 
     // do unit testing of this class
     public static void main(String[] args) {
-        ArrayList empty = new ArrayList();
-        SAP sap = new SAP(new Digraph(10));
-        sap.checkBounds(empty, empty);
+
     }
 }

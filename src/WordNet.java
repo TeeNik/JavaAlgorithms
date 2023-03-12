@@ -22,11 +22,11 @@ public class WordNet {
         this.synsets = new HashMap<>();
         this.nouns = new HashMap<>();
 
-        readSynsets(hypernyms);
-        readHypernyms(synsets);
+        readSynsets(synsets);
+        readHypernyms(hypernyms);
 
         DirectedCycle cycle = new DirectedCycle(this.hypernyms);
-        if (cycle.hasCycle() && !rootedDAG(this.hypernyms)) {
+        if (cycle.hasCycle() || !rootedDAG(this.hypernyms)) {
             throw new IllegalArgumentException();
         }
 
@@ -40,6 +40,7 @@ public class WordNet {
 
     // is the word a WordNet noun?
     public boolean isNoun(String word) {
+        if (word == null) throw new IllegalArgumentException();
         return nouns.containsKey(word);
     }
 
@@ -95,7 +96,7 @@ public class WordNet {
         for (int i = 0; i < g.V(); ++i) {
             if (!g.adj(i).iterator().hasNext()) {
                 ++roots;
-                if (roots > 0) {
+                if (roots > 1) {
                     return false;
                 }
             }
