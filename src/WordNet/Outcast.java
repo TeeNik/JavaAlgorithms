@@ -1,8 +1,10 @@
+package WordNet;
+
 public class Outcast {
 
     private final WordNet wordnet;
 
-    // constructor takes a WordNet object
+    // constructor takes a WordNet.WordNet object
     public Outcast(WordNet wordnet) {
         this.wordnet = wordnet;
     }

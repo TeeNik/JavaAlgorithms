@@ -1,3 +1,5 @@
+package WordNet;
+
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
@@ -14,16 +16,16 @@ public class WordNet {
     private SAP sap;
 
     // constructor takes the name of the two input files
-    public WordNet(String synsets, String hypernyms) {
-        if (synsets == null || hypernyms == null) {
+    public WordNet(String synsetsPath, String hypernymsPath) {
+        if (synsetsPath == null || hypernymsPath == null) {
             throw new IllegalArgumentException();
         }
 
         this.synsets = new HashMap<>();
         this.nouns = new HashMap<>();
 
-        readSynsets(synsets);
-        readHypernyms(hypernyms);
+        readSynsets(synsetsPath);
+        readHypernyms(hypernymsPath);
 
         DirectedCycle cycle = new DirectedCycle(this.hypernyms);
         if (cycle.hasCycle() || !rootedDAG(this.hypernyms)) {
@@ -33,12 +35,12 @@ public class WordNet {
         sap = new SAP(this.hypernyms);
     }
 
-    // returns all WordNet nouns
+    // returns all WordNet.WordNet nouns
     public Iterable<String> nouns() {
         return nouns.keySet();
     }
 
-    // is the word a WordNet noun?
+    // is the word a WordNet.WordNet noun?
     public boolean isNoun(String word) {
         if (word == null) throw new IllegalArgumentException();
         return nouns.containsKey(word);
@@ -107,7 +109,6 @@ public class WordNet {
     private void readHypernyms(String path) {
         In in = new In(path);
         this.hypernyms = new Digraph(synsets.size());
-
 
         while (!in.isEmpty()) {
             String line = in.readLine();

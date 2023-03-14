@@ -1,3 +1,5 @@
+package WordNet;
+
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
 
@@ -57,7 +59,6 @@ public class SAP {
     private void bfdp(Integer v, Integer w) {
         checkBounds(v, w);
         bfdp(Arrays.asList(new Integer[] {v}), Arrays.asList(new Integer[] {w}));
-
     }
 
     private void bfdp(Iterable<Integer> v, Iterable<Integer> w) {
