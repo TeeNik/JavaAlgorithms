@@ -14,12 +14,12 @@ public class SeamCarver {
             throw new IllegalArgumentException();
         }
 
-        this.picture = picture;
+        this.picture = new Picture(picture);
     }
 
     // current picture
     public Picture picture() {
-        return picture;
+        return new Picture(picture);
     }
 
     // width of current picture
@@ -46,8 +46,8 @@ public class SeamCarver {
     }
 
     private double delta(int x1, int y1, int x2, int y2) {
-        Color pixel1 = picture().get(x1, y1);
-        Color pixel2 = picture().get(x2, y2);
+        Color pixel1 = picture.get(x1, y1);
+        Color pixel2 = picture.get(x2, y2);
         return Math.pow(pixel2.getRed() - pixel1.getRed(), 2)
                 + Math.pow(pixel2.getGreen() - pixel1.getGreen(), 2)
                 + Math.pow(pixel2.getBlue() - pixel1.getBlue(), 2);
@@ -157,7 +157,7 @@ public class SeamCarver {
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
-        if (seam == null || seam.length != width() || width() <= 1) {
+        if (seam == null || seam.length != width() || height() <= 1) {
             throw new IllegalArgumentException();
         }
         checkSeam(seam);
@@ -176,7 +176,7 @@ public class SeamCarver {
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
-        if (seam == null || seam.length != height() || height() <= 1) {
+        if (seam == null || seam.length != height() || width() <= 1) {
             throw new IllegalArgumentException();
         }
         checkSeam(seam);
