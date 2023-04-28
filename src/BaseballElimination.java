@@ -1,22 +1,27 @@
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.FlowEdge;
+import edu.princeton.cs.algs4.FlowNetwork;
+import edu.princeton.cs.algs4.FordFulkerson;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 public class BaseballElimination {
 
-    private int numOfTeams;
-    private HashMap<String, Integer[]> teams;
-    private HashMap<Integer, String> teamIndexToName;
-    private int[][] against;
-    private Bag<String> subset;
-    private int[] wins;
-    private boolean checked;
-
     private final static int INDEX = 0;
     private final static int WINS = 1;
     private final static int LOSSES = 2;
     private final static int REMAINING = 3;
+
+    private final int numOfTeams;
+    private final HashMap<String, Integer[]> teams;
+    private final HashMap<Integer, String> teamIndexToName;
+    private final int[][] against;
+    private ArrayList<String> subset;
+    private final int[] wins;
+
 
     // create a baseball division from given filename in format specified below
     public BaseballElimination(String filename) {
@@ -93,8 +98,7 @@ public class BaseballElimination {
     public boolean isEliminated(String team) {
         checkTeam(team);
 
-        boolean flag = false;
-        subset = new Bag<>();
+        subset = new ArrayList<>();
 
         //trivial elimination
         Iterator<String> teamNames = teams().iterator();
@@ -102,25 +106,16 @@ public class BaseballElimination {
             String current = teamNames.next();
             if (wins(team) + remaining(team) < wins(current)) {
                 subset.add(current);
-                checked = true;
                 return true;
             }
         }
-        flag = flowCheck(team);
-        checked = true;
-        return flag;
-    }
-
-    private int numOfGameCombinations(int numOfTeams) {
-        final int n = numOfTeams;
-        return n * (n - 1) / 2;
+        return flowCheck(team);
     }
 
     private boolean flowCheck(String team) {
         //initialize flow network with source [size - 2] and sink [size - 1]
-        final int games = numOfGameCombinations(numOfTeams);
+        final int games = numOfTeams * (numOfTeams - 1) / 2;
         final int size = 2 + numOfTeams + games;
-        final int teamIndex = teams.get(team)[INDEX];
         FlowNetwork network = new FlowNetwork(size);
 
         int s = games + numOfTeams;
@@ -129,8 +124,6 @@ public class BaseballElimination {
         int vertex = 0;
 
         //add edges for source to game combination vertices to teams
-        int sum = 0;
-        String[] networkTeams = new String[numOfTeams - 1];
         for (int i = 0; i < numOfTeams; ++i) {
             network.addEdge(new FlowEdge(games + i, t, remaining(team) + wins(team) - wins(teamIndexToName.get(i))));
             for (int j = i + 1; j < numOfTeams; ++j) {
@@ -148,7 +141,6 @@ public class BaseballElimination {
         }
         else {
             int index = 0;
-            subset = new Bag<>();
             for (int v = games; v < games + numOfTeams; ++v) {
                 if (ff.inCut(v)) {
                     subset.add(teamIndexToName.get(index));
