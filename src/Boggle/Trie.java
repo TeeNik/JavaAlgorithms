@@ -1,3 +1,5 @@
+package Boggle;
+
 public class Trie {
     private static final char OFFSET = 'A';
     private Node root = new Node();
