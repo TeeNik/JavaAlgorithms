@@ -1,20 +1,26 @@
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
+import java.util.LinkedList;
+
 public class MoveToFront {
 
     private static final int R = 256;
 
     // apply move-to-front encoding, reading from standard input and writing to standard output
     public static void encode() {
-        char[] aux = new char[R];
-        for (int i = 0; i < R; ++i) {
-            aux[i] = (char) i;
+
+        LinkedList<Character> aux = new LinkedList<>();
+        for (int i = 0; i < R; i++) {
+            aux.add((char)i);
         }
 
-        String in = BinaryStdIn.readString();
-        for (int i = 0; i < in.length(); ++i) {
-            move(aux, in.charAt(i), true);
+        while(!BinaryStdIn.isEmpty()) {
+            char c = BinaryStdIn.readChar();
+            int toFront = aux.indexOf(c);
+            aux.remove(toFront);
+            aux.addFirst(c);
+            BinaryStdOut.write(toFront, 8);
         }
 
         BinaryStdOut.close();
@@ -40,15 +46,16 @@ public class MoveToFront {
 
     // apply move-to-front decoding, reading from standard input and writing to standard output
     public static void decode() {
-        char[] aux = new char[R];
-        for (int i = 0; i < R; ++i) {
-            aux[i] = (char) i;
+        LinkedList<Character> aux = new LinkedList<>();
+        for (int i = 0; i < R; i++) {
+            aux.add((char)i);
         }
 
-        while (!BinaryStdIn.isEmpty()) {
-            int pos = BinaryStdIn.readInt(8);
-            BinaryStdOut.write(aux[pos]);
-            move(aux, aux[pos], false);
+        while(!BinaryStdIn.isEmpty()) {
+            char toFront = BinaryStdIn.readChar();
+            char c = aux.remove((int)toFront);
+            aux.addFirst(c);
+            BinaryStdOut.write(c);
         }
         BinaryStdOut.close();
     }
