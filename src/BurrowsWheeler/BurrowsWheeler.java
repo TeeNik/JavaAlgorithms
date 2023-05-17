@@ -1,3 +1,5 @@
+package BurrowsWheeler;
+
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
@@ -13,17 +15,21 @@ public class BurrowsWheeler {
 
         int first = 0;
         int length = input.length();
+        StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < length; ++i) {
             if (csa.index(i) == 0) {
                 first = i;
             }
-        }
-        BinaryStdOut.write(first);
 
-        for (int i = 0; i < length; ++i) {
-            int last = (csa.index(i) - i + length) % length;
-            BinaryStdOut.write(input.charAt(last));
+            int prev = csa.index(i) - 1;
+            if (prev < 0) prev += length;
+
+            sb.append(input.charAt(prev));
         }
+
+        BinaryStdOut.write(first);
+        BinaryStdOut.write(sb.toString());
 
         BinaryStdOut.close();
     }

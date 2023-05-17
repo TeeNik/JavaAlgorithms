@@ -1,3 +1,5 @@
+package BurrowsWheeler;
+
 import edu.princeton.cs.algs4.BinaryStdIn;
 import edu.princeton.cs.algs4.BinaryStdOut;
 
